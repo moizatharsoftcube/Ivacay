@@ -64,7 +64,6 @@
                 <div class="col-xs-12 col-sm-8 col-md-8 centerCol">
                     <div class="row">
                         <div class="col-lg-12  align-content-center col-xs-12 sign_btn">
-                            <button id="connectBtn" class="btn  btn-lg btn-block ">Connect Wallet</button>
                             <button id="payEthBtn" class="btn  btn-lg btn-block ">Pay Now</button>
                         </div>
                     </div>
@@ -79,6 +78,7 @@
         <script>
 
             $(document).ready(function () {
+
                 let eth_url = 'https://min-api.cryptocompare.com/data/price?fsym=ETH&tsyms=ETH,USD';
                 let eth_data = "";
                 let eth_res = AjaxRequest_get(eth_url, eth_data);
@@ -97,24 +97,25 @@
 
 
                 const connectBtn = document.querySelector('#connectBtn');
+                const payEthBtn = document.querySelector("#payEthBtn");
 
-                connectBtn.addEventListener('click', async () => {
-                    if (typeof window.ethereum !== 'undefined') {
-                        toastr["success"]("MetaMask is installed!");
-                    } else {
-                        console.log("fasdas");
-                        toastr["error"]("No crypto wallet found. Please install it.");
-                    }
-
-                    const accounts = await ethereum.request({method: 'eth_requestAccounts'});
-                    const account1 = accounts[0]
-                });
+                // connectBtn.addEventListener('click', async () => {
+                //     if (typeof window.ethereum !== 'undefined') {
+                //         toastr["success"]("MetaMask is installed!");
+                //     } else {
+                //         toastr["error"]("No crypto wallet found. Please install it.");
+                //     }
+                //
+                //     const accounts = await ethereum.request({method: 'eth_requestAccounts'});
+                //     const account1 = accounts[0]
+                // });
 
                 const startPayment = async ({ether, addr}) => {
                     try {
                         if (!window.ethereum) throw new Error("No crypto wallet found. Please install it.");
 
                         await window.ethereum.send("eth_requestAccounts");
+                        toastr["success"]("MetaMask is installed!");
                         const provider = new ethers.providers.Web3Provider(window.ethereum);
                         const signer = provider.getSigner();
                         ethers.utils.getAddress(addr);
