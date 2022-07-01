@@ -103,7 +103,7 @@ class UIController extends EmailController
         if (Auth::check() && Auth::user()->id) {
             $review_model = new ReviewModel();
             $review_model->user_id = Auth::user()->id;
-            $review_model->message = $request->message;
+            $review_model->message = preg_replace("/<!--.*?-->/", "", $request->message);;
             $review_model->star = $request->rating;
             $review_model->status = 1;
             $review_model->save();
@@ -111,7 +111,7 @@ class UIController extends EmailController
                 return redirect()->route('UI_reviews')->with('success', 'submitted');
             }
         } else {
-            return redirect()->route('UI_reviews')->with('error', 'Login Requried');
+            return redirect()->route('UI_share_experience')->with('error', 'Login Requried');
         }
         return redirect()->route('UI_index');
     }
