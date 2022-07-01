@@ -108,7 +108,7 @@ class UIController extends EmailController
             $review_model->status = 1;
             $review_model->save();
             if ($review_model->save()) {
-                return redirect()->route('UI_reviews')->with('success', 'submitted');
+                return redirect()->route('UI_share_experience')->with('success', 'submitted');
             }
         } else {
             return redirect()->route('UI_share_experience')->with('error', 'Login Requried');
