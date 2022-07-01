@@ -39,61 +39,6 @@ class UIController extends EmailController
     {
         return view('about-us');
     }
-//    public function reviews()
-//    {
-//        $reviews = ReviewModel::where('status', 1)->with('getReviewUser')->get();
-//        $review_star = ReviewModel::where('status', 1)->pluck('star')->avg();
-//        $review_avg = number_format((float)$review_star, 1, '.', '');
-//
-//        $excellent = ReviewModel::where('star', 5)->where('status', 1)->pluck('star')->count();
-//        $good = ReviewModel::where('star', 4)->where('status', 1)->pluck('star')->count();
-//        $average = ReviewModel::where('star', 3)->where('status', 1)->pluck('star')->count();
-//        $poor = ReviewModel::where('star', 2)->where('status', 1)->pluck('star')->count();
-//        $terrible = ReviewModel::where('star', 1)->where('status', 1)->pluck('star')->count();
-//
-//        //Excellent
-//        if($excellent  <= 0){$excellent_bar = 'bar-1';}
-//        elseif ($excellent < 10  && $excellent > 0){$excellent_bar = 'bar-2';}
-//        elseif ($excellent < 30  && $excellent > 10){$excellent_bar = 'bar-3';}
-//        elseif ($excellent < 60  && $excellent > 30){$excellent_bar = 'bar-4';}
-//        elseif ($excellent <= 100  && $excellent > 60){$excellent_bar = 'bar-5';}
-//        elseif ($excellent > 100){$excellent_bar = 'bar-6';}
-//
-//        //Good
-//        if($good  <= 0){$good_bar = 'bar-1';}
-//        elseif ($good < 10  && $good > 0){$good_bar = 'bar-2';}
-//        elseif ($good < 30  && $good > 10){$good_bar = 'bar-3';}
-//        elseif ($good < 60  && $good > 30){$good_bar = 'bar-4';}
-//        elseif ($good <= 100  && $good > 60){$good_bar = 'bar-5';}
-//        elseif ($good > 100){$good_bar = 'bar-6';}
-//
-//        //Average
-//        if($average  <= 0){$average_bar = 'bar-1';}
-//        elseif ($average < 10  && $average > 0){$average_bar = 'bar-2';}
-//        elseif ($average < 30  && $average > 10){$average_bar = 'bar-3';}
-//        elseif ($average < 60  && $average > 30){$average_bar = 'bar-4';}
-//        elseif ($average <= 100  && $average > 60){$average_bar = 'bar-5';}
-//        elseif ($average > 100){$average_bar = 'bar-6';}
-//
-//        //Poor
-//        if($poor  <= 0){$poor_bar = 'bar-1';}
-//        elseif ($poor < 10  && $poor > 0){$poor_bar = 'bar-2';}
-//        elseif ($poor < 30  && $poor > 10){$poor_bar = 'bar-3';}
-//        elseif ($poor < 60  && $poor > 30){$poor_bar = 'bar-4';}
-//        elseif ($poor <= 100  && $poor > 60){$poor_bar = 'bar-5';}
-//        elseif ($poor > 100){$poor_bar = 'bar-6';}
-//
-//        //Terrible
-//        if($terrible  <= 0){$terrible_bar = 'bar-1';}
-//        elseif ($terrible < 10  && $terrible > 0){$terrible_bar = 'bar-2';}
-//        elseif ($terrible < 30  && $terrible > 10){$terrible_bar = 'bar-3';}
-//        elseif ($terrible < 60  && $terrible > 30){$terrible_bar = 'bar-4';}
-//        elseif ($terrible <= 100  && $terrible > 60){$terrible_bar = 'bar-5';}
-//        elseif ($terrible > 100){$terrible_bar = 'bar-6';}
-//
-//        return view('reviews', compact('reviews', 'review_avg','excellent','good','average','poor','terrible','excellent_bar','good_bar','average_bar','poor_bar','terrible_bar'));
-//    }
-
     public function submit_review(Request $request)
     {
         $request->validate([
