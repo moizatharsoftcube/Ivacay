@@ -103,7 +103,7 @@ class UIController extends EmailController
         if (Auth::check() && Auth::user()->id) {
             $review_model = new ReviewModel();
             $review_model->user_id = Auth::user()->id;
-            $review_model->message = preg_replace("/<!--.*?-->/", "", $request->message);;
+            $review_model->message = str_replace('"', "",$request->message);
             $review_model->star = $request->rating;
             $review_model->status = 1;
             $review_model->save();
