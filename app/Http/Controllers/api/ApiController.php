@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\api;
 
+use App\Models\ReviewModel;
 use Illuminate\Http\Request;
 use App\Models\User;
 use App\Models\PackageModel;
@@ -28,13 +29,13 @@ class ApiController extends EmailController
         {
            return response()->json([
             'message' => 'Package not found'
-         ],404); 
+         ],404);
         }
     }
     public function country()
     {
         $data = CountryModel::all();
-        
+
         if($data){
             return response()->json([
             'data' => $data,
@@ -97,6 +98,26 @@ class ApiController extends EmailController
             return response()->json([
                     'message' => 'Country Not Found',
                 ],404);
+        }
+    }
+    //Review
+    public function reviews()
+    {
+        $reviews = ReviewModel::where('status', 1)->with('getReviewUser')->get();
+        $review_star = ReviewModel::where('status', 1)->pluck('star')->avg();
+        $review_avg = number_format((float)$review_star, 1, '.', '');
+
+
+        if ($reviews && $review_avg) {
+            return response()->json([
+                'reviews' => $reviews,
+                'review_avg' => $review_avg,
+            ], 200);
+        } else {
+            return response()->json([
+                'data' => $reviews,
+                'message' => 'Review Not Found',
+            ], 404);
         }
     }
     //mz
