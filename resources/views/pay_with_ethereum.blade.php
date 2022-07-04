@@ -96,7 +96,7 @@
                 }
 
 
-                // const connectBtn = document.querySelector('#connectBtn');
+                const connectBtn = document.querySelector('#connectBtn');
                 const payEthBtn = document.querySelector("#payEthBtn");
 
                 // connectBtn.addEventListener('click', async () => {
@@ -144,6 +144,7 @@
                     }
                 }
 
+                const payEthBtn = document.querySelector("#payEthBtn");
 
                 payEthBtn.addEventListener("click", () => {
 

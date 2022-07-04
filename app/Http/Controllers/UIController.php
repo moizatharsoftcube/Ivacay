@@ -190,7 +190,6 @@ class UIController extends EmailController
             'password' => ['required'],
             'user_role' => ['required'],
             'country_id' => ['required'],
-            'phone' => ['required'],
             'image' => ['required','mimes:jpeg,png,jpg,max:2048'],
         ]);
         $user = new User();
