@@ -107,7 +107,7 @@ class ApiController extends EmailController
 
         if ($reviews && $review_avg) {
             return response()->json([
-                'data' => $reviews,
+                'reviews' => $reviews,
                 'review_avg' => $review_avg,
             ], 200);
         } else {
@@ -126,7 +126,7 @@ class ApiController extends EmailController
         );
         $validator = Validator::make($request->all(), $rules);
         if ($validator->fails()) {
-            return response()->json($validator->errors(),422);
+            return $validator->errors();
         }
         $review_model = new ReviewModel();
         $review_model->user_id = Auth::user()->id;
