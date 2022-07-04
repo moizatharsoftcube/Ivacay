@@ -9,6 +9,8 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Auth;
 use App\Http\Controllers\Controller;
 use App\Http\Controllers\EmailController;
+use Intervention\Image\Facades\Image;
+use Storage;
 
 use Illuminate\Support\Facades\Validator;
 
@@ -90,7 +92,7 @@ class HomeController extends EmailController
         $img->stream();
 
         /** Make a new filename with extension */
-        $path = Storage::disk('local')->put('public/image2/' . $filename, $img);
+        $path = Storage::disk('local')->put('public/users/' . $filename, $img);
 
         /** Update the image index in the data array to update the image path to be stored in database */
         $data['image'] = $filename;
