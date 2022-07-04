@@ -61,7 +61,7 @@ class HomeController extends EmailController
         $validator = Validator::make($request->all(), $rules);
 
         if ($validator->fails()) {
-            return response()->json(['errors' => $validator->errors()], 422);
+            return response()->json($validator->errors(),422);
         }
 
         $user = new User();
@@ -136,7 +136,7 @@ class HomeController extends EmailController
         $validator = Validator::make($request->all(), $rules);
 
         if ($validator->fails()) {
-            return response()->json(['errors' => $validator->errors()], 422);
+            return response()->json($validator->errors(),422);
         }
         //Mz
 
