@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\guider;
 
 use App\Http\Controllers\Controller;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\Request;
 
 use App\Models\JobModel;
@@ -21,27 +22,28 @@ use App\Models\JourneysModel;
 
 class GuiderController extends Controller
 {
-    // index page in now job portal 
+    // index page in now job portal
     public function index()
     {
         $job = JobModel::get();
-        return view('guider.index',compact('job'));
+        return view('guider.index', compact('job'));
     }
+
     public function orders_list()
     {
         $orders = JourneysModel::where('guide_id', auth()->user()->id)->get();
-        return view('guider.orders_list',compact('orders'));
+        return view('guider.orders_list', compact('orders'));
     }
+
     public function job_applied($job)
     {
         $pre_applied_job = JobAppliedModel::where('user_id', auth()->user()->id)->where('status', 0)->first();
-        if($pre_applied_job)
-        {
+        if ($pre_applied_job) {
             return back()->with('error', 'You can\'t apply! Your previous applied job is not done yet');
         } else {
             $job_for_apply = JobModel::find($job);
             $guider = User::find(auth()->user()->id);
-    
+
             $applied_job = new JobAppliedModel();
             $applied_job->user_id = $guider->id;
             $applied_job->job_id = $job_for_apply->id;
@@ -60,15 +62,12 @@ class GuiderController extends Controller
 
     public function guider_profile()
     {
-        if(Auth::check())
-        {
+        if (Auth::check()) {
             $member = MembershipModel::where('user_id', auth()->user()->id)->orderBy('id', 'DESC')->first();
-            if($member)
-            {
+            if ($member) {
                 $pkg_expiry = $member->created_at->addDay($member->duration);
                 $now = Carbon::now();
-                if($pkg_expiry > $now)
-                {
+                if ($pkg_expiry > $now) {
 //==============================================================================================================================
                     $countries = CountryModel::all();
                     $profile = ProfileModel::where('user_id', auth()->user()->id)->with('getProfileUser')->first();
@@ -87,22 +86,21 @@ class GuiderController extends Controller
 
     public function update_guider_profile(Request $req)
     {
-        if(Auth::check()){
-            if(Auth()->user()->id && Auth()->user()->id > 0){
+        if (Auth::check()) {
+            if (Auth()->user()->id && Auth()->user()->id > 0) {
                 $validate_image = '';
-            }else{
-                $validate_image='required|image|mimes:jpeg,png,jpg|max:2048';
+            } else {
+                $validate_image = 'required|image|mimes:jpeg,png,jpg|max:2048';
             }
         }
         $req->validate([
             'image' => $validate_image,
         ]);
         $profile = ProfileModel::where('user_id', auth()->user()->id)->first();
-        if(!$profile)
-        {
+        if (!$profile) {
             $profile = new ProfileModel();
         }
-        if($req->image){
+        if ($req->image) {
             $imageName = time() . '.' . $req->image->getClientOriginalExtension();
             $req->image->move(public_path('/users'), $imageName);
             $user = User::where('id', auth()->user()->id)->first();
@@ -123,19 +121,98 @@ class GuiderController extends Controller
         return back()->with('success', 'Profile updated');
     }
 
+    //Meta For Guider
+    public function pay_with_meta(MembershipPlanModel $plan)
+    {
+        if (Auth::check()) {
+            $plan_id = $plan->id;
+            $plan_price = $plan->price;
+            return view('guider.stripe_payment', compact('plan_id', 'plan_price'));
+        } else {
+            return view('login');
+        }
+    }
+
+    public function eth_conversion(Request $request, MembershipPlanModel $plan)
+    {
+        $oneusd = 1 / $request->eth_res_usd;
+        $plan_eth = $oneusd * $plan->price;
+        return response()->json(array('plan_eth' => $plan_eth, 'message' => 'converted', 'status' => 1));
+    }
+
+    public function meta_form(Request $request, MembershipPlanModel $plan)
+    {
+        $inv_no = rand('111111111', '999999999');
+
+        if ($request->hash && $request->from) {
+            //condition store database Order // Member Model
+
+            // CHECKING CURRENT MEMBERSHIP REQUEST WITH THE PREVIOUS SUBSCRIPTION
+            //Checking user already purchase plan or not
+            $member = MembershipModel::where('user_id', auth()->user()->id)->orderBy('id', 'DESC')->first();
+            if ($member) {
+                //If a user already purchase package we will get count of packages for validate count of packages
+                $user_packages = PackageModel::where('user_id', auth()->user()->id)->where('status', 0)->orderBy('id', 'DESC')->get();
+                if ($plan->no_of_packages < count($user_packages)) {
+                    $a = 0;
+                    foreach ($user_packages as $user_package) {
+                        if ($a < $plan->no_of_packages) {
+                            $user_package->status = 0;
+                        } else {
+                            $user_package->status = 1;
+                        }
+                        $user_package->save();
+                        $a++;
+                    }
+                    // for($a = $plan->no_of_packages; $a <= count($user_packages); $a++)
+                    // {
+                    // $user_packages[a]->status = 1;
+                    // $user_packages[a]->save();
+                    // }
+//                    return view('guider.stripe_payment', compact('plan_id'));
+                }
+            }
+            // CHECKING CURRENT MEMBERSHIP REQUEST WITH THE PREVIOUS SUBSCRIPTION
+
+            $invoice = rand('111111111','999999999');
+            $user = Auth::user();
+            $desc = $plan->title;
+            $price = $plan->price;
+
+            //condition store database Order
+            $membership_obj = new MembershipModel();
+            $membership_obj->invoice_number = "meta".$invoice;
+            $membership_obj->user_id = auth()->user()->id;
+            $membership_obj->membership_id = $plan->id;
+            $membership_obj->payment_type = "Through Meta";
+            $membership_obj->meta_hash = $request->hash;
+            $membership_obj->meta_from = $request->from;
+
+
+            $membership_obj->no_of_packages = $plan->no_of_packages;
+            $membership_obj->duration = $plan->duration;
+            $membership_obj->title = $plan->title;
+            $membership_obj->price = $plan->price;
+//            $membership_obj->status =1; //0=Process,1=completed,2=rejected
+//            $membership_obj->is_paid =1; //0=Unsuccessful,1=Successful
+            $membership_obj->save();
+
+            return response()->json(['status' => 1, 'message' => 'Payment Successful']);
+        } else {
+            return response()->json(['message' => 'Payment UnSuccessful']);
+        }
+    }
+
 
     public function stripe_form(MembershipPlanModel $membership)
     {
         $plan_id = $membership->id;
         $member = MembershipModel::where('user_id', auth()->user()->id)->orderBy('id', 'DESC')->first();
         $free_plan = MembershipPlanModel::where('title', 'Free')->first();
-        if($membership->id != $free_plan->id)
-        {
-            if($member)
-            {
+        if ($membership->id != $free_plan->id) {
+            if ($member) {
                 $user_packages = PackageModel::where('user_id', auth()->user()->id)->where('status', 0)->get();
-                if($membership->no_of_packages >= count($user_packages))
-                {
+                if ($membership->no_of_packages >= count($user_packages)) {
                     return view('guider.stripe_payment', compact('plan_id'));
                 } else {
                     return view('guider.stripe_payment', compact('plan_id'))->with('warning', 'We\'ll Inactive your exceeding packages after payment');
@@ -143,10 +220,9 @@ class GuiderController extends Controller
             } else {
                 return view('guider.stripe_payment', compact('plan_id'));
             }
-        }else {
+        } else {
             $member_free = MembershipModel::where('user_id', auth()->user()->id)->where('membership_id', $free_plan->id)->first();
-            if($member_free)
-            {
+            if ($member_free) {
                 return back()->with('error', 'Your free package expires. Please buy our plan to proceed');
             }
             $membership_obj = new MembershipModel();
@@ -161,23 +237,19 @@ class GuiderController extends Controller
         return back()->with('warning', 'Something went wrong');
     }
 
-    
+
     public function event_stripe(Request $req)
     {
         $plan = MembershipPlanModel::find($req->plan_id);
 
         // CHECKING CURRENT MEMBERSHIP REQUEST WITH THE PREVIOUS SUBSCRIPTION
         $member = MembershipModel::where('user_id', auth()->user()->id)->orderBy('id', 'DESC')->first();
-        if($member)
-        {
+        if ($member) {
             $user_packages = PackageModel::where('user_id', auth()->user()->id)->where('status', 0)->orderBy('id', 'DESC')->get();
-            if($plan->no_of_packages < count($user_packages))
-            {
+            if ($plan->no_of_packages < count($user_packages)) {
                 $a = 0;
-                foreach($user_packages as $user_package)
-                {
-                    if($a < $plan->no_of_packages)
-                    {
+                foreach ($user_packages as $user_package) {
+                    if ($a < $plan->no_of_packages) {
                         $user_package->status = 0;
                     } else {
                         $user_package->status = 1;
@@ -187,8 +259,8 @@ class GuiderController extends Controller
                 }
                 // for($a = $plan->no_of_packages; $a <= count($user_packages); $a++)
                 // {
-                    // $user_packages[a]->status = 1;
-                    // $user_packages[a]->save();
+                // $user_packages[a]->status = 1;
+                // $user_packages[a]->save();
                 // }
                 return view('guider.stripe_payment', compact('plan_id'));
             }
@@ -201,12 +273,12 @@ class GuiderController extends Controller
         $price = $plan->price;
         $response = $this->stripe_payment($user->email, $req->stripeToken, $price, $desc);
 
-        if ($response['status'] == 'succeeded') 
-        {
-            //condition store database Order 
+        if ($response['status'] == 'succeeded') {
+            //condition store database Order
             $membership_obj = new MembershipModel();
             $membership_obj->user_id = auth()->user()->id;
             $membership_obj->membership_id = $plan->id;
+            $membership_obj->payment_type = 'Through Stripe';
             $membership_obj->payment_id = $response['id'];
             $membership_obj->receipt_url = $response['receipt_url'];
             $membership_obj->no_of_packages = $plan->no_of_packages;

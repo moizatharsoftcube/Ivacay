@@ -35,7 +35,8 @@ class GuiderPackageController extends Controller
                 }
             }
             $plans = MembershipPlanModel::where('plan_type', null)->get();
-            return view('guider.membership_plans', compact('plans'))->with('error', 'Your membership expires! Please buy according to your need');
+            $current_plan = 0;
+            return view('guider.membership_plans', compact('plans','current_plan'))->with('error', 'Your membership expires! Please buy according to your need');
         }
         return redirect(route('UI_login'));
     }
