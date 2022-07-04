@@ -30,7 +30,7 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
 
     //Review
     Route::get('/reviews', [ApiController::class, 'reviews']);
-    Route::post('/send-review', [ApiController::class, 'submit_review']);
+    Route::post('/submit-review', [ApiController::class, 'submit_review']);
 
     //UI Auth
     Route::post('/logout', [HomeController::class, 'logout']);

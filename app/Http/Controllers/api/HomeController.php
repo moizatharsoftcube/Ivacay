@@ -39,15 +39,15 @@ class HomeController extends EmailController
         //     'access_token' => $token,
         //     'token_type' => 'Bearer',
         // ]);
-        
+
         //Mz
         $user = User::where('email', $request->email)->first();
-		
+
 		if($user)
 		{
 		   return response()->json([
                'message' => 'Email already exists',
-            ], 401); 
+            ], 401);
 		}
         $rules = array(
 			'username' => ['required'],
@@ -56,13 +56,13 @@ class HomeController extends EmailController
             'country_id' => ['required'],
 		);
 		$validator = Validator::make($request->all(), $rules);
-		
+
 		if ($validator->fails()) {
 		    return response()->json(['errors'=>$validator->errors()],422);
 		}
 		//Mz
-		
-		
+
+
         // $this->validate($request, [
         //     'username' => ['required'],
         //     'email' => ['required', 'unique:users'],
@@ -79,7 +79,7 @@ class HomeController extends EmailController
         $user->user_role = 0;
         if($user->save())
         {
-       
+
         $profile = new ProfileModel();
         $profile->user_id = $user->id;
         $profile->full_name = $user->username;
@@ -87,9 +87,9 @@ class HomeController extends EmailController
         $profile->phone = $request->phone;
         // $profile->country = $req->country;
         $profile->save();
-      
+
         //mz --- mail shoot stopped bz (test-links stop)
-        
+
         // //to shoot an email
         // $this->verifyEmail($user->id);
         return response()->json([
@@ -100,9 +100,9 @@ class HomeController extends EmailController
         {
            return response()->json([
             'message' => 'Error'
-         ],419); 
+         ],419);
         }
-        
+
         //return back()->with('success','Account created successfully!');
     }
     public function login(Request $request)
@@ -112,21 +112,21 @@ class HomeController extends EmailController
             'email' => 'required|email',
             'password' => 'required',
 		);
-	
+
 		$validator = Validator::make($request->all(), $rules);
-		
+
 		if ($validator->fails()) {
 		    return response()->json(['errors'=>$validator->errors()],422);
 		}
 		//Mz
-	    	
+
 		$user = User::where('email', $request->email)->first();
-		
+
 		if(!$user)
 		{
 		   return response()->json([
                 'message' => 'Invalid Email'
-            ], 401); 
+            ], 401);
 		}
         if (!Auth::attempt($request->only('email', 'password'))) {
             return response()->json([
@@ -134,11 +134,11 @@ class HomeController extends EmailController
             ], 401);
         }
 
-    
+
         if($user->status==1)
         {
            $token = $user->createToken('auth_token')->plainTextToken;
-           $role;
+
             if($user->user_role==0)
             {
                 $user->role='tourist';
@@ -149,14 +149,14 @@ class HomeController extends EmailController
             }
             else
             {
-               $user->role='admin'; 
+               $user->role='admin';
             }
-            
+
             return response()->json([
                 'access_token' => $token,
                 'token_type' => 'Bearer',
                 'data'=>$user
-            ]); 
+            ]);
         }
         else
         {
@@ -164,7 +164,7 @@ class HomeController extends EmailController
                 'message' => 'Email not verfied'
             ],401);
         }
-        
+
     }
     public function loginRequired()
     {
