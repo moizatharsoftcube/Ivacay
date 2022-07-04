@@ -101,7 +101,7 @@ class ApiController extends EmailController
     //Review
     public function reviews()
     {
-        $reviews = ReviewModel::where('status', 1)->with('getReviewUser')->get();
+        $reviews = ReviewModel::where('status', 1)->with('getReviewUser')->orderBy('id', 'desc')->get();
         $review_star = ReviewModel::where('status', 1)->pluck('star')->avg();
         $review_avg = number_format((float)$review_star, 1, '.', '');
 
