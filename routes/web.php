@@ -178,6 +178,11 @@ Route::group(['middleware'=>['protectedPage']], function(){
         Route::get('guider-stripe-form/{membership?}', [GuiderController::class, 'stripe_form'])->name('Guider_stripe_form');
         Route::post('/payee', [GuiderController::class, 'event_stripe'])->name('stripe_post');
 
+        // Meta For Guider
+        Route::get('/guider-pay-with/{plan?}', [GuiderController::class, 'pay_with_meta'])->name('Guider_pay_with_meta');
+        Route::post('/guider-eth-conversion/{plan?}', [GuiderController::class, 'eth_conversion'])->name('guider_eth_conversion');
+        Route::post('guider-meta-form/{plan?}', [GuiderController::class, 'meta_form'])->name('Guider_meta_form');
+
         // Facebook Login URL
         Route::prefix('facebook')->name('facebook.')->group( function(){
             Route::get('auth', [FaceBookController::class, 'loginUsingFacebook'])->name('login');

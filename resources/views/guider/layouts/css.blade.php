@@ -10,6 +10,12 @@
 
 
 <!-- ================================== -->
-
+<!-- Toaster CSS-->
+<link href="{{asset('build/toastr.css')}}" rel="stylesheet" type="text/css" />
+<style>
+    #toast-container *{
+        font-size:100% !important;
+    }
+</style>
 
 @stack('css')
